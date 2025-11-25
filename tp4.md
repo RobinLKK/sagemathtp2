@@ -1,158 +1,138 @@
-# ============================================================
-# TP4 – FICHE RÉVISION : ÉQUATIONS DIFFÉRENTIELLES EN SAGEMATH
+# TP4 – SageMath : Équations Différentielles  
 # Auteur : Robin GAWLAS
-# ============================================================
 
-# ------------------------------------------------------------
-# 📌 Objectifs
-# ------------------------------------------------------------
-# - Savoir reconnaître une équation différentielle (type, ordre)
-# - Résoudre symboliquement avec desolve
-# - Résoudre numériquement avec desolve_rk4
-# - Utiliser des conditions initiales
-# - Vérifier une solution
-# - Tracer solutions et champs de pentes
-# - Gérer les EDO linéaires, homogènes, non homogènes, et 2ème ordre
+## 🧭 Résumé rapide (pour GitHub)
 
-# ------------------------------------------------------------
-# 📌 1. Déclarer variables et fonctions
-# ------------------------------------------------------------
+### 🎯 Objectif  
+Manipuler et résoudre des équations différentielles ordinaires (EDO) avec SageMath :
+- Résolution symbolique (desolve)
+- Résolution numérique (desolve_rk4)
+- Tracer les solutions
+- Visualiser des champs de directions
+- Gérer les conditions initiales
+- Étudier des équations d’ordre 1 et 2
 
-var('x')                  # variable réelle
-y = function('y')(x)      # y(x) comme vraie fonction
+## 🧩 Notions essentielles
 
-# ------------------------------------------------------------
-# 📌 2. Résolution symbolique (EDO 1er ordre)
-# ------------------------------------------------------------
-# Forme : y' = f(x,y)
+| Notion | Exemple |
+|--------|---------|
+| EDO 1er ordre | y' = f(x, y) |
+| Linéaire | y' + a y = b |
+| Second ordre | y'' + a y' + b y = g(x) |
+| Condition initiale | y(x₀) = y₀ |
+| Solution générale | y = y_h + y_p |
+| Résolution symbolique | desolve(...) |
+| Résolution numérique | desolve_rk4(...) |
+| Visualisation | plot_slope_field, plot |
 
-eq = diff(y, x) == f(x)          # équation
-sol = desolve(eq, y)             # solution générale
+# 📘 Version complète et pédagogique
 
-# Avec condition initiale (CI) :
-sol_ci = desolve(eq, y, ics=[x0, y0])
+# 1️⃣ EDO du premier ordre  
 
-# ------------------------------------------------------------
-# 📌 3. Résolution d'une EDO LINÉAIRE
-# ------------------------------------------------------------
-# Forme : y' + a*y = b
+### Exemple  
+y' = x - y
 
-eq = diff(y, x) + a*y == b
-sol = desolve(eq, y)
-
-# ------------------------------------------------------------
-# 📌 4. Résolution d'une EDO du second ordre
-# ------------------------------------------------------------
-# Forme : y'' + a*y' + b*y = g(x)
-
-eq2 = diff(y, x, 2) + a*diff(y, x) + b*y == g(x)
-
-# CI : y(x0) = c1 et y’(x0) = c2
-sol2 = desolve(eq2, y, ics=[x0, c1, c2])
-
-# ------------------------------------------------------------
-# 📌 5. Vérification qu'une fonction est solution
-# ------------------------------------------------------------
-# Résultat = 0 → c'est bien une solution
-
-eq.substitute(y == sol).full_simplify()
-
-# ------------------------------------------------------------
-# 📌 6. Résolution numérique (méthode RK4)
-# ------------------------------------------------------------
-# Usage quand Sage ne peut pas résoudre symboliquement
-
-f(x, y) = ...
-sol_points = desolve_rk4(f, y, x0, y0, step=0.1, end_points=[xmin, xmax])
-
-# sol_points = liste de points → list_plot pour tracer
-
-# ------------------------------------------------------------
-# 📌 7. Tracer une solution
-# ------------------------------------------------------------
-plot(sol, (x, xmin, xmax))
-
-# Tracé pour solution numérique :
-list_plot(sol_points)
-
-# ------------------------------------------------------------
-# 📌 8. Champ de pentes (direction field)
-# ------------------------------------------------------------
-
+### SageMath
 var('x y')
-f(x, y) = ...
+eq = diff(y, x) == x - y
+sol = desolve(eq, y)
+show(sol)
 
-plot_slope_field(f, (x, xmin, xmax), (y, ymin, ymax))
+### Résultat attendu  
+y(x) = x - 1 + C e^{-x}
 
-# ------------------------------------------------------------
-# 📌 9. Superposer champ + solution
-# ------------------------------------------------------------
+### Condition initiale
+desolve(eq, y, ics=[0, 2])
 
-p = plot_slope_field(f, (x,-3,3),(y,-3,3))
-p += plot(sol, (x,-3,3), color='red')
-show(p)
+# 2️⃣ Équations différentielles linéaires  
 
-# ------------------------------------------------------------
-# 📌 10. Tracer plusieurs solutions (multisolutions)
-# ------------------------------------------------------------
+### Exemple  
+y' - y = x
+
+eq = diff(y, x) - y == x
+sol = desolve(eq, y)
+show(sol)
+
+### Résultat :  
+y(x) = x - 1 + C e^{x}
+
+# 3️⃣ Second ordre  
+
+### Exemple  
+y'' + 3y' + 2y = e^x
 
 var('x')
 y = function('y')(x)
-p = plot_slope_field(f, (x,-5,5), (y,-5,5))
 
-for y0 in [-2,-1,0,1,2]:
-    sol = desolve(diff(y,x)==f(x,y), y, ics=[0, y0])
-    p += plot(sol, (x,-5,5))
+eq = diff(y, x, 2) + 3*diff(y, x) + 2*y == exp(x)
+sol = desolve(eq, y)
+show(sol)
+
+# 4️⃣ Résolution numérique — Runge–Kutta (RK4)
+
+### Exemple  
+y' = y - x^2
+
+f(x, y) = y - x^2
+sol = desolve_rk4(f, y, 0, 1, step=0.1, end_points=[0, 5])
+list_plot(sol)
+
+# 5️⃣ Champ de directions
+
+eq = diff(y, x) == x - y
+sol = desolve(eq, y, ics=[0, 1])
+
+p1 = plot_slope_field(x - y, (x, -3, 3), (y, -3, 3))
+p2 = plot(sol, (x, -3, 3), color='red', thickness=2)
+
+show(p1 + p2)
+
+# 6️⃣ Tracés multiples
+
+p = plot_slope_field(x-y, (x,-3,3), (y,-3,3))
+
+for c in [-2, -1, 0, 1, 2]:
+    sol = desolve(diff(y, x) == x - y, y, ics=[0, c])
+    p += plot(sol, (x,-3,3))
 
 show(p)
 
-# ------------------------------------------------------------
-# 📌 11. Reconnaître le type d’équation
-# ------------------------------------------------------------
+# 📊 FICHE RÉCAP — Commandes SageMath
 
-# 1er ordre générale :
-#     y' = f(x,y)
+# Déclarations
+var('x y')
+y = function('y')(x)
 
-# 1er ordre linéaire :
-#     y' + a(x)*y = b(x)
+# Résolution symbolique
+desolve(diff(y, x) == f(x), y)
 
-# homogène :
-#     y' + a(x)*y = 0 → solution = C*exp( - ∫ a(x) dx )
+# Avec CI
+desolve(diff(y, x) == f(x), y, ics=[x0, y0])
 
-# 2ème ordre linéaire :
-#     y'' + a y' + b y = g(x)
+# Équation linéaire
+desolve(diff(y, x) + a*y == b, y)
 
-# autonome :
-#     y' = f(y)
+# Second ordre
+desolve(diff(y,x,2) + a*diff(y,x) + b*y == g(x), y)
 
-# séparables :
-#     y' = f(x)*g(y) → dy/g(y) = f(x) dx → intégrer
+# Résolution numérique RK4
+f(x,y) = y - x^2
+desolve_rk4(f, y, x0, y0, step=0.1, end_points=[xmin, xmax])
 
-# ------------------------------------------------------------
-# 📌 12. Les commandes MINIMALES à connaître (pour l’éval)
-# ------------------------------------------------------------
+# Tracé solution
+plot(sol, (x, xmin, xmax))
 
-# Résolution symbolique :
-desolve(diff(y,x)==f(x), y)
+# Champ de directions
+plot_slope_field(f(x,y), (x,xmin,xmax), (y,ymin,ymax))
 
-# CI 1er ordre :
-desolve(diff(y,x)==f(x), y, ics=[x0,y0])
+# Superposition champ + solution
+plot_slope_field(...) + plot(sol, ...)
 
-# CI 2ème ordre :
-desolve(diff(y,x,2)+a*diff(y,x)+b*y == g(x), y, ics=[x0,y0,dy0])
+# 🎓 Conclusion
 
-# Vérification :
-eq.substitute(y==sol).full_simplify()
-
-# Champ de pentes :
-plot_slope_field(f(x,y), (x,a,b), (y,c,d))
-
-# Tracer une solution :
-plot(sol, (x,a,b))
-
-# Résolution numérique :
-desolve_rk4(f, y, x0, y0, step=0.1, end_points=[a,b])
-
-# ------------------------------------------------------------
-# FIN DE LA FICHE RÉVISION
-# ------------------------------------------------------------
+# Le TP4 enseigne toutes les bases nécessaires pour manipuler et comprendre
+# les équations différentielles ordinaires dans SageMath :
+# - Résolution symbolique
+# - Résolution numérique
+# - Visualisation graphique
+# Il prépare aux méthodes avancées (systèmes différentiels, stabilité, etc.).
