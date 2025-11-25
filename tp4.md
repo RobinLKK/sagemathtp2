@@ -1,138 +1,123 @@
-# TP4 – SageMath : Équations Différentielles  
-# Auteur : Robin GAWLAS
+# Fiche de révision – TP4 Équations différentielles (SageMath)
 
-## 🧭 Résumé rapide (pour GitHub)
+## 1. Définition
+Une **équation différentielle (ED)** relie une fonction inconnue \( y(x) \) à ses dérivées.  
+Exemples :
+- \( y' + y = e^{-x} \)
+- \( y' - y = x \)
+- \( y'' + y = 0 \)
 
-### 🎯 Objectif  
-Manipuler et résoudre des équations différentielles ordinaires (EDO) avec SageMath :
-- Résolution symbolique (desolve)
-- Résolution numérique (desolve_rk4)
-- Tracer les solutions
-- Visualiser des champs de directions
-- Gérer les conditions initiales
-- Étudier des équations d’ordre 1 et 2
+## 2. Résolution d’ED du 1er ordre – Méthode générale
+Pour une ED linéaire :
+\[
+y'(x) + a(x) y(x) = b(x)
+\]
 
-## 🧩 Notions essentielles
+### a) Cas homogène
+\[
+y'_h + a(x) y_h = 0
+\]
+→ Solution :
+\[
+y_h = C \, e^{-\int a(x) dx}
+\]
 
-| Notion | Exemple |
-|--------|---------|
-| EDO 1er ordre | y' = f(x, y) |
-| Linéaire | y' + a y = b |
-| Second ordre | y'' + a y' + b y = g(x) |
-| Condition initiale | y(x₀) = y₀ |
-| Solution générale | y = y_h + y_p |
-| Résolution symbolique | desolve(...) |
-| Résolution numérique | desolve_rk4(...) |
-| Visualisation | plot_slope_field, plot |
+### b) Cas particulier
+Méthode classique :  
+On cherche \( y_p \) vérifiant l'équation complète.  
+Exemples courants :
+- Si \( b(x)=k e^{mx} \), on teste \( y_p = lpha e^{mx} \)
+- Si \( b(x)=P_n(x) \), on teste un polynôme du même degré
 
-# 📘 Version complète et pédagogique
+### c) Solution générale
+\[
+y = y_h + y_p
+\]
 
-# 1️⃣ EDO du premier ordre  
+### d) Application d’une condition initiale
+On utilise :
+\[
+y(x_0) = y_0
+\]
+→ permet de déterminer la constante C.
 
-### Exemple  
-y' = x - y
+---
 
-### SageMath
-var('x y')
-eq = diff(y, x) == x - y
-sol = desolve(eq, y)
-show(sol)
+## 3. Exemple traité dans le TP :  
+### ### Équation :  
+\[
+y' + y = e^{-x}
+\]
 
-### Résultat attendu  
-y(x) = x - 1 + C e^{-x}
+### a) Solution homogène :
+\[
+y_h = C e^{-x}
+\]
 
-### Condition initiale
-desolve(eq, y, ics=[0, 2])
+### b) Solution particulière :
+On teste \( y_p = lpha x e^{-x} \).  
+On trouve finalement :
+\[
+y_p = rac{x}{2} e^{-x}
+\]
 
-# 2️⃣ Équations différentielles linéaires  
+### c) Solution générale :
+\[
+y = C e^{-x} + rac{x}{2} e^{-x}
+\]
 
-### Exemple  
-y' - y = x
+### d) Exemple avec condition initiale
+Si \( y(0)=1 \) :
+- On obtient \( C = 1 \)
+- Solution :
+\[
+y(x) = e^{-x} + rac{x}{2} e^{-x}
+\]
 
-eq = diff(y, x) - y == x
-sol = desolve(eq, y)
-show(sol)
+---
 
-### Résultat :  
-y(x) = x - 1 + C e^{x}
+## 4. Résolution avec SageMath
 
-# 3️⃣ Second ordre  
-
-### Exemple  
-y'' + 3y' + 2y = e^x
-
+### Définir variables et fonction
+```python
 var('x')
 y = function('y')(x)
+```
 
-eq = diff(y, x, 2) + 3*diff(y, x) + 2*y == exp(x)
-sol = desolve(eq, y)
-show(sol)
+### Déclarer l’équation différentielle
+```python
+eq = diff(y, x) + y == exp(-x)
+```
 
-# 4️⃣ Résolution numérique — Runge–Kutta (RK4)
+### Résoudre l’équation
+```python
+desolve(eq, y)
+```
 
-### Exemple  
-y' = y - x^2
+### Condition initiale
+```python
+desolve(eq, y, ics=[0, 1])
+```
 
-f(x, y) = y - x^2
-sol = desolve_rk4(f, y, 0, 1, step=0.1, end_points=[0, 5])
-list_plot(sol)
+### Tracer la solution
+```python
+sol = desolve(eq, y, ics=[0,1])
+plot(sol, (x, -2, 4))
+```
 
-# 5️⃣ Champ de directions
+---
 
-eq = diff(y, x) == x - y
-sol = desolve(eq, y, ics=[0, 1])
+## 5. Méthodes vues dans le TP
+- Définir une ED dans SageMath  
+- Résoudre symboliquement  
+- Utiliser des conditions initiales (`ics=[x0, y0]`)  
+- Tracer les solutions  
+- Manipuler les solutions (simplification, substitution…)
 
-p1 = plot_slope_field(x - y, (x, -3, 3), (y, -3, 3))
-p2 = plot(sol, (x, -3, 3), color='red', thickness=2)
+---
 
-show(p1 + p2)
-
-# 6️⃣ Tracés multiples
-
-p = plot_slope_field(x-y, (x,-3,3), (y,-3,3))
-
-for c in [-2, -1, 0, 1, 2]:
-    sol = desolve(diff(y, x) == x - y, y, ics=[0, c])
-    p += plot(sol, (x,-3,3))
-
-show(p)
-
-# 📊 FICHE RÉCAP — Commandes SageMath
-
-# Déclarations
-var('x y')
-y = function('y')(x)
-
-# Résolution symbolique
-desolve(diff(y, x) == f(x), y)
-
-# Avec CI
-desolve(diff(y, x) == f(x), y, ics=[x0, y0])
-
-# Équation linéaire
-desolve(diff(y, x) + a*y == b, y)
-
-# Second ordre
-desolve(diff(y,x,2) + a*diff(y,x) + b*y == g(x), y)
-
-# Résolution numérique RK4
-f(x,y) = y - x^2
-desolve_rk4(f, y, x0, y0, step=0.1, end_points=[xmin, xmax])
-
-# Tracé solution
-plot(sol, (x, xmin, xmax))
-
-# Champ de directions
-plot_slope_field(f(x,y), (x,xmin,xmax), (y,ymin,ymax))
-
-# Superposition champ + solution
-plot_slope_field(...) + plot(sol, ...)
-
-# 🎓 Conclusion
-
-# Le TP4 enseigne toutes les bases nécessaires pour manipuler et comprendre
-# les équations différentielles ordinaires dans SageMath :
-# - Résolution symbolique
-# - Résolution numérique
-# - Visualisation graphique
-# Il prépare aux méthodes avancées (systèmes différentiels, stabilité, etc.).
+## 6. Points clés à retenir
+- Une ED se résout via *homogène + particulière*.  
+- SageMath facilite énormément les calculs.  
+- Toujours vérifier la solution en la réinjectant dans l’ED.  
+- Les conditions initiales rendent la solution **unique**.
